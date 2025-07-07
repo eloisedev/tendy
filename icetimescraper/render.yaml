@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ice-times-site
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    branch: master
+
+cronJobs:
+  - name: daily-scrape
+    schedule: "0 6 * * *"
+    command: node scrape.mjs
