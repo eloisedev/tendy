@@ -1,22 +1,12 @@
 import express from 'express';
-import fs from 'fs';
+import path from 'path';
 
 const app = express();
-const PORT = 3000;
 
-// Serve your static frontend files (assuming you have index.html in 'public' folder)
-app.use(express.static('public'));
-
-// API endpoint to get scraped ice times
 app.get('/api/ice-times', (req, res) => {
-  fs.readFile('ice_times.json', 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Failed to read ice times' });
-    }
-    res.json(JSON.parse(data));
-  });
+  res.sendFile(path.join(process.cwd(), 'icetimescraper', 'ice_times.json'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Server running');
 });
