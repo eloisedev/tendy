@@ -10,5 +10,5 @@ services:
 
 cronJobs:
   - name: daily-scrape
-    schedule: "0 4 * * *"
-    command: node scrape.mjs
+    schedule: "0 4 * * *"   # 4:00 UTC = midnight EDT
+    command: node icetimescraper/scrape.mjs
