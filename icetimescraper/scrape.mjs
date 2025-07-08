@@ -1,50 +1,39 @@
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
 import fs from 'fs';
 
 async function scrapeIceTimes() {
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  // Set the target date (can make dynamic later)
-  const date = '2025-07-07';
+  const today = new Date();
+  const date = today.toISOString().split('T')[0]; // YYYY-MM-DD
   const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${date}&&sport_ids=31`;
 
-  await page.goto(url, { waitUntil: 'networkidle0' });
+  await page.goto(url, { waitUntil: 'load' });
+  await page.waitForTimeout(6000); // Let Angular finish loading
 
-  // Wait and scroll to trigger loading
-  await new Promise(resolve => setTimeout(resolve, 10000));
-  await page.evaluate(() => window.scrollBy(0, 1000));
+  const results = await page.evaluate(() => {
+    const cards = document.querySelectorAll('.card-body');
+    const data = [];
 
-  // Extract events
-  const events = await page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll('.card.w-100.mx-0.mb-3.px-0.shadow-sm'));
-
-    return cards.map(card => {
-      const nameEl = card.querySelector('h6.text-truncate');
-      const timeEl = card.querySelector('.d-flex.w-100.justify-content-between > div');
-      const locationEl = card.querySelector('.fa-map-marker-alt')?.parentElement;
+    cards.forEach((card) => {
+      const name = card.querySelector('h6')?.innerText.trim();
+      const time = card.querySelector('.d-flex.w-100.justify-content-between div')?.innerText.trim();
+      const location = card.querySelector('.fa-map-marker-alt')?.parentElement?.innerText.trim();
       const signupButton = card.querySelector('button');
+      const signupLink = signupButton ? signupButton.getAttribute('onclick') || signupButton.getAttribute('href') || null : null;
 
-      return {
-        name: nameEl?.innerText.trim() || null,
-        time: timeEl?.innerText.trim() || null,
-        location: locationEl?.innerText.trim() || null,
-        signupLink: signupButton?.closest('a')?.href || null
-      };
+      if (name && time && location) {
+        data.push({ name, time, location, signupLink });
+      }
     });
+
+    return data;
   });
 
-  // Add the date to each event
-  const datedEvents = events.map(event => ({
-    ...event,
-    date: '2025-07-07'
-  }));
-
-  // Save to file
-  fs.writeFileSync('ice_times.json', JSON.stringify(datedEvents, null, 2));
-  console.log('✅ Events scraped:', datedEvents.length);
-
   await browser.close();
+  fs.writeFileSync('ice_times.json', JSON.stringify(results, null, 2));
 }
 
 scrapeIceTimes();
+
