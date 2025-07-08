@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ice Times in NOVA</title>
+</head>
+<body>
+  <h1>Ice Times</h1>
+  <ul id="iceTimesList"></ul>
+
+  <script>
+    async function fetchIceTimes() {
+      const res = await fetch('/api/ice-times');
+      const iceTimes = await res.json();
+
+      const list = document.getElementById('iceTimesList');
+      list.innerHTML = ''; // Clear existing
+
+      iceTimes.forEach(event => {
+        const li = document.createElement('li');
+        li.textContent = `${event.date} - ${event.name} at ${event.location}, Time: ${event.time}`;
+        list.appendChild(li);
+      });
+    }
+
+    fetchIceTimes();
+  </script>
+</body>
+</html>
