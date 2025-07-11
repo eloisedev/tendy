@@ -10,7 +10,7 @@
 
   <script>
     async function fetchIceTimes() {
-      const res = await fetch('icetimes.json');
+      const res = await fetch('ice_times.json');
       const iceTimes = await res.json();
 
       const list = document.getElementById('iceTimesList');
