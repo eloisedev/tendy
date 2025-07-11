@@ -1,0 +1,35 @@
+name: Daily Ice Time Scraper
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # 4 AM UTC = 12 AM Eastern
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run scraper
+        run: node scrape.mjs
+
+      - name: Commit & push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ice_times.json
+          git commit -m "Update ice times (auto)"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
