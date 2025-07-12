@@ -26,13 +26,16 @@ jobs:
 
       - name: Run scraper
         run: node scrape.mjs
+        - name: Commit JSON
 
       - name: Commit and push updated ice_times.json
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email github-actions@github.com
+          git config --unset http.https://github.com/.extraheader
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
           git add ice_times.json
           git commit -m "Update ice times [auto]" || echo "No changes to commit"
-          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main
+          git push 
