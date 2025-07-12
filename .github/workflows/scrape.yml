@@ -2,8 +2,8 @@ name: Daily Scrape
 
 on:
   schedule:
-    - cron: '0 4 * * *'  # Runs at 12:00am EDT (4am UTC)
-  workflow_dispatch:  # Allows manual run
+    - cron: '0 4 * * *'  # Runs at 12:00am EST (4am UTC)
+  workflow_dispatch:  # Allows manual run from GitHub UI
 
 jobs:
   scrape:
