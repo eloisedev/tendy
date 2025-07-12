@@ -38,4 +38,4 @@ jobs:
           git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main
           git add ice_times.json
           git commit -m "Update ice times [auto]" || echo "No changes to commit"
-          git push 
+          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main 
