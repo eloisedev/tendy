@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false  # disable default token
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -26,7 +28,6 @@ jobs:
 
       - name: Run scraper
         run: node scrape.mjs
-        - name: Commit JSON
 
       - name: Commit and push updated ice_times.json
         env:
@@ -35,7 +36,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email github-actions@github.com
           git config --unset http.https://github.com/.extraheader
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
           git add ice_times.json
           git commit -m "Update ice times [auto]" || echo "No changes to commit"
-          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main 
+          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main
