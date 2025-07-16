@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 4 * * *'  # 12:00 AM EST
   workflow_dispatch:
+    inputs:
+      date: 
+        description: 'optional date to scrape (YYYY-MM-DD)'
+        required: false
+        default: ''
 
 jobs:
   scrape:
@@ -27,27 +32,27 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run scraper
-        run: node scrape.mjs
+        run: node scrape.mjs ${{ github.event.inputs.date }}
 
       - name: Commit and push updated ice_times.json
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          echo "🔒 Testing token access..."
+          echo "testing token access"
           git ls-remote https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy || exit 1
 
-          echo "🔧 Setting up Git"
+          echo "setting up git"
           git config --global user.name "github-actions[bot]"
           git config --global user.email github-actions@github.com
 
-          echo "🔃 Fetching latest main"
+          echo "fetching latest main"
           git fetch origin
           git reset --hard origin/main
 
-          echo "📦 Committing changes"
+          echo "committing changes"
           git add ice_times.json
           git commit -m "Update ice times [auto]" || echo "No changes to commit"
 
-          echo "🚀 Pushing to main"
+          echo "pushing to main"
           git push https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy HEAD:main
 
