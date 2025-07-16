@@ -6,12 +6,19 @@ async function scrapeIceTimes() {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
+  // ✅ Use custom date if passed, otherwise default to now
+  const inputDateArg = process.argv[2];
   const easternNow = DateTime.now().setZone('America/New_York');
-  const date = easternNow.toFormat('yyyy-MM-dd');
+  const targetDate = inputDateArg
+    ? DateTime.fromISO(inputDateArg, { zone: 'America/New_York' })
+    : easternNow;
+
+  const date = targetDate.toFormat('yyyy-MM-dd');
   const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${date}&&sport_ids=31`;
 
+  console.log(`🧊 Scraping ice times for ${date}`);
   await page.goto(url, { waitUntil: 'load' });
-  await page.waitForSelector('.card-body', { timeout: 10000 }); // Wait for real content
+  await page.waitForSelector('.card-body', { timeout: 10000 });
 
   const results = await page.evaluate(() => {
     const cards = document.querySelectorAll('.card-body');
@@ -32,7 +39,7 @@ async function scrapeIceTimes() {
     return data;
   });
 
-  console.log(`Found ${results.length} ice time(s)`); // ✅ helpful log
+  console.log(`✅ Found ${results.length} ice time(s)`);
 
   await browser.close();
   fs.writeFileSync('ice_times.json', JSON.stringify(results, null, 2));
