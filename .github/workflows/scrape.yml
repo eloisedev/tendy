@@ -33,13 +33,21 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
+          echo "🔒 Testing token access..."
+          git ls-remote https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy || exit 1
 
+          echo "🔧 Setting up Git"
           git config --global user.name "github-actions[bot]"
           git config --global user.email github-actions@github.com
-          git config --unset http.https://github.com/.extraheader
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy
+
+          echo "🔃 Fetching latest main"
           git fetch origin
           git reset --hard origin/main
+
+          echo "📦 Committing changes"
           git add ice_times.json
           git commit -m "Update ice times [auto]" || echo "No changes to commit"
-          git push origin HEAD:main
+
+          echo "🚀 Pushing to main"
+          git push https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy HEAD:main
+
