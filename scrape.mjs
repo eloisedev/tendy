@@ -19,7 +19,7 @@ async function scrapeIceTimes() {
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForSelector('.card-body', { timeout: 10000 });
 
-  const results = await page.evaluate(() => {
+    const results = await page.evaluate(() => {
     const cards = document.querySelectorAll(".d-flex w-100 justify-content-between mb-1");
     const data = [];
 
@@ -38,7 +38,7 @@ async function scrapeIceTimes() {
     return data;
   });
 
-  console.log(`✅ Found ${results.length} ice time(s)`);
+  console.log(`found ${results.length} ice time(s)`);
 
   await browser.close();
   fs.writeFileSync('ice_times.json', JSON.stringify(results, null, 2));
