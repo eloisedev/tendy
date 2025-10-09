@@ -17,26 +17,31 @@ async function scrapeIceTimes() {
 
   console.log(`scraping ice times for ${date}`);
   await page.goto(url, { waitUntil: 'load' });
-  await page.waitForSelector('.card-body', { timeout: 10000 });
+const results = await page.evaluate(() => {
+  const cards = document.querySelectorAll('.card-body');
+  const data = [];
 
-    const results = await page.evaluate(() => {
-    const cards = document.querySelectorAll(".d-flex w-100 justify-content-between mb-1");
-    const data = [];
+  cards.forEach((card) => {
+    const name = card.querySelector('h6')?.innerText?.trim();
+    const time = card.querySelector('.d-flex.w-100.justify-content-between.mb-1 div')?.innerText?.trim();
+    const price = [...card.querySelectorAll('.d-flex.w-100.justify-content-between.mb-1 div')]
+      .map(el => el.innerText.trim())
+      .find(text => text.includes('$')) || null;
 
-    cards.forEach((card) => {
-      const name = card.querySelector("h6")?.innerText.trim();
-      const time = card.querySelector('.d-flex.w-100.justify-content-between div')?.innerText.trim();
-      const location = card.querySelector('.fa-map-marker-alt')?.parentElement?.innerText.trim();
-      const signupButton = card.querySelector('button');
-      const signupLink = signupButton ? signupButton.getAttribute('onclick') || signupButton.getAttribute('href') || null : null;
+    const signupButton = card.querySelector('a[href*="registration"], button');
+    const signupLink = signupButton
+      ? signupButton.getAttribute('href') ||
+        signupButton.getAttribute('onclick')?.match(/'(.*?)'/)?.[1] ||
+        null
+      : null;
 
-      if (name && time && location) {
-        data.push({ name, time, location, signupLink });
-      }
-    });
-
-    return data;
+    if (name && time && signupLink) {
+      data.push({ name, time, price, signupLink });
+    }
   });
+
+  return data;
+});
 
   console.log(`found ${results.length} ice time(s)`);
 
