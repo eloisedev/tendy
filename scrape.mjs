@@ -16,7 +16,7 @@ async function scrapeIceTimes() {
   const date = targetDate.toFormat('yyyy-MM-dd');
   const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${date}&&sport_ids=31`;
 
-  console.log(`🧊 Scraping ice times for ${date}`);
+  console.log(`scraping ice times for ${date}`);
   await page.goto(url, { waitUntil: 'load', timeout: 60000 });
 
   // Wait for event cards to load (DaySmart loads dynamically)
@@ -24,6 +24,10 @@ async function scrapeIceTimes() {
     () => document.querySelectorAll('.card-body h6').length > 0,
     { timeout: 20000 }
   );
+
+  const html = await page.content();
+  fs.writeFileSync('debug.html', html);
+
 
   const results = await page.evaluate(() => {
     const cards = document.querySelectorAll('.card-body');
