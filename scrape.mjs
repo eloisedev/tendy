@@ -4,22 +4,30 @@ import fs from 'fs';
 const date = process.argv[2] || '2025-10-11';
 
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false }); // headless false for debugging
   const page = await browser.newPage();
 
-  await page.goto('https://example.com'); // Replace with your target URL
-  await page.waitForLoadState('domcontentloaded');
+  await page.goto('https://example.com', { waitUntil: 'networkidle' }); // wait for network idle
+  console.log('Page loaded');
 
-  // Adjust selector to whatever you need
+  // Wait for at least one card-body to appear
+  try {
+    await page.waitForSelector('.card-body', { timeout: 10000 });
+  } catch {
+    console.error('No .card-body found on the page!');
+    await browser.close();
+    return;
+  }
+
   const cards = await page.$$eval('.card-body', nodes =>
     nodes.map(node => ({
-      title: node.querySelector('h2')?.innerText || '',
-      description: node.querySelector('p')?.innerText || ''
+      title: node.querySelector('h2')?.innerText || 'NO TITLE',
+      description: node.querySelector('p')?.innerText || 'NO DESCRIPTION'
     }))
   );
 
   fs.writeFileSync(`data-${date}.json`, JSON.stringify(cards, null, 2));
+  console.log(`Scraped ${cards.length} items:`, cards);
 
-  console.log(`Scraped ${cards.length} items.`);
   await browser.close();
 })();
