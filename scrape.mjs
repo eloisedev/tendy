@@ -6,6 +6,7 @@ async function scrapeIceTimes() {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
+  // Allow passing a date argument, defaults to today in Eastern Time
   const inputDateArg = process.argv[2];
   const easternNow = DateTime.now().setZone('America/New_York');
   const targetDate = inputDateArg
@@ -15,38 +16,59 @@ async function scrapeIceTimes() {
   const date = targetDate.toFormat('yyyy-MM-dd');
   const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${date}&&sport_ids=31`;
 
-  console.log(`scraping ice times for ${date}`);
-  await page.goto(url, { waitUntil: 'load' });
-const results = await page.evaluate(() => {
-  const cards = document.querySelectorAll('.card-body');
-  const data = [];
+  console.log(`🧊 Scraping ice times for ${date}`);
+  await page.goto(url, { waitUntil: 'load', timeout: 60000 });
 
-  cards.forEach((card) => {
-    const name = card.querySelector('h6')?.innerText?.trim();
-    const time = card.querySelector('.d-flex.w-100.justify-content-between.mb-1 div')?.innerText?.trim();
-    const price = [...card.querySelectorAll('.d-flex.w-100.justify-content-between.mb-1 div')]
-      .map(el => el.innerText.trim())
-      .find(text => text.includes('$')) || null;
+  // Wait for event cards to load (DaySmart loads dynamically)
+  await page.waitForFunction(
+    () => document.querySelectorAll('.card-body h6').length > 0,
+    { timeout: 20000 }
+  );
 
-    const signupButton = card.querySelector('a[href*="registration"], button');
-    const signupLink = signupButton
-      ? signupButton.getAttribute('href') ||
-        signupButton.getAttribute('onclick')?.match(/'(.*?)'/)?.[1] ||
-        null
-      : null;
+  const results = await page.evaluate(() => {
+    const cards = document.querySelectorAll('.card-body');
+    const data = [];
 
-    if (name && time && signupLink) {
-      data.push({ name, time, price, signupLink });
-    }
+    cards.forEach((card) => {
+      const name = card.querySelector('h6')?.innerText?.trim() || null;
+
+      // Grab the first time range (like “6:40 PM – 7:50 PM”)
+      const timeBlock = card.querySelector('.d-flex.w-100.justify-content-between.mb-1 div');
+      const time = timeBlock ? timeBlock.innerText.trim() : null;
+
+      // Find the first text that includes a dollar sign
+      const price =
+        Array.from(card.querySelectorAll('.d-flex.w-100.justify-content-between.mb-1 div'))
+          .map((el) => el.innerText.trim())
+          .find((text) => text.includes('$')) || null;
+
+      // Extract the signup link
+      const signupButton = card.querySelector('a[href*="registration"], button');
+      const signupLink = signupButton
+        ? signupButton.getAttribute('href') ||
+          signupButton.getAttribute('onclick')?.match(/'(.*?)'/)?.[1] ||
+          null
+        : null;
+
+      if (name && time && signupLink) {
+        data.push({ name, time, price, signupLink });
+      }
+    });
+
+    return data;
   });
 
-  return data;
-});
-
   console.log(`found ${results.length} ice time(s)`);
+  console.log(results);
 
-  await browser.close();
   fs.writeFileSync('ice_times.json', JSON.stringify(results, null, 2));
+  await browser.close();
+
+  console.log('saved to ice_times.json');
 }
 
-scrapeIceTimes();
+scrapeIceTimes().catch((err) => {
+  console.error('error during scrape:', err);
+  process.exit(1);
+});
+
