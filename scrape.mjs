@@ -1,39 +1,25 @@
-const { chromium } = require('playwright');
-const fs = require('fs');
+import { chromium } from 'playwright';
+import fs from 'fs';
+
+const date = process.argv[2] || '2025-10-11';
 
 (async () => {
-  
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  
-  await page.goto('https://www.ministickandshoot.com/programs-events', { waitUntil: 'domcontentloaded' });
+  await page.goto('https://example.com'); // Replace with your target URL
+  await page.waitForLoadState('domcontentloaded');
 
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-
-  await page.waitForFunction(
-    () => document.querySelectorAll('.card-body h6').length > 0,
-    { timeout: 60000 }
+  // Adjust selector to whatever you need
+  const cards = await page.$$eval('.card-body', nodes =>
+    nodes.map(node => ({
+      title: node.querySelector('h2')?.innerText || '',
+      description: node.querySelector('p')?.innerText || ''
+    }))
   );
 
-  const events = await page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll('.card-body'));
-    return cards.map(card => {
-      const title = card.querySelector('h6')?.innerText.trim() || '';
-      const date = card.querySelector('.event-date')?.innerText.trim() || '';
-      const time = card.querySelector('.event-time')?.innerText.trim() || '';
-      const link = card.querySelector('a')?.href || '';
-      return { title, date, time, link };
-    });
-  });
+  fs.writeFileSync(`data-${date}.json`, JSON.stringify(cards, null, 2));
 
-  console.log('Found events:', events);
-
-  fs.writeFileSync('events.json', JSON.stringify(events, null, 2));
-
-  const html = await page.content();
-  fs.writeFileSync('debug.html', html);
-
+  console.log(`Scraped ${cards.length} items.`);
   await browser.close();
 })();
-
