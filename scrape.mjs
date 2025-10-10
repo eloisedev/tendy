@@ -4,13 +4,12 @@ import fs from 'fs';
 const date = process.argv[2] || '2025-10-11';
 
 (async () => {
-  const browser = await chromium.launch({ headless: false }); // headless false for debugging
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  await page.goto('https://example.com', { waitUntil: 'networkidle' }); // wait for network idle
+  await page.goto('https://example.com', { waitUntil: 'networkidle' });
   console.log('Page loaded');
 
-  // Wait for at least one card-body to appear
   try {
     await page.waitForSelector('.card-body', { timeout: 10000 });
   } catch {
