@@ -27,23 +27,24 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
       { timeout: 60000 }
     );
   } catch {
-    console.error('no events found timeout 60s.');
+    console.error('no events found - timeout 60s.');
     await browser.close();
     process.exit(0);
   }
 
   const events = await page.evaluate(() => {
-    const cards = document.querySelectorAll('.card');
-    return Array.from(cards).map(card => {
-      const title = card.querySelector('h6')?.innerText.trim() || '';
-      const dateTime = card.querySelector('.text-muted')?.innerText.trim() || '';
-      const button = card.querySelector('button, a');
+    const iceTimes = document.querySelectorAll('.card-body');
+    return Array.from(iceTimes).map(iceTime => {
+      const title = iceTime.querySelector('.flex-grow-1 text-truncate mb-0 mr-2')?.innerText.trim() || '';
+      const time = iceTime.querySelector('.ng-tns-c8-2')?.innerText.trim() || '';
+      const date = easternNow;
+      const button = iceTime.querySelector('.btn btn-sm btn-block rounded-pill mt-2 mb-2 btn-primary');
       const link =
         button?.getAttribute('onclick') ||
         button?.getAttribute('href') ||
         '';
 
-      return { title, dateTime, link };
+      return { title, time, date, link };
     });
   });
 
