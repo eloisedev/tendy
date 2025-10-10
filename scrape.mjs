@@ -1,32 +1,59 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
-const date = process.argv[2] || '2025-10-11';
+const now = new Date();
+const easternNow = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/New_York',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).format(now).replaceAll('/', '-');
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  await page.goto('https://example.com', { waitUntil: 'networkidle' });
-  console.log('Page loaded');
+  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternNow}&&sport_ids=31`;
+  console.log(`scraping events for ${easternNow}`);
+  console.log(`url: ${url}`);
+
+  await page.goto(url, { waitUntil: 'networkidle' });
+
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
   try {
-    await page.waitForSelector('.card-body', { timeout: 10000 });
+    await page.waitForFunction(
+      () => document.querySelectorAll('h6').length > 0,
+      { timeout: 60000 }
+    );
   } catch {
-    console.error('No .card-body found on the page!');
+    console.error('no events found timeout 60s.');
     await browser.close();
-    return;
+    process.exit(0);
   }
 
-  const cards = await page.$$eval('.card-body', nodes =>
-    nodes.map(node => ({
-      title: node.querySelector('h2')?.innerText || 'NO TITLE',
-      description: node.querySelector('p')?.innerText || 'NO DESCRIPTION'
-    }))
-  );
+  const events = await page.evaluate(() => {
+    const cards = document.querySelectorAll('.card');
+    return Array.from(cards).map(card => {
+      const title = card.querySelector('h6')?.innerText.trim() || '';
+      const dateTime = card.querySelector('.text-muted')?.innerText.trim() || '';
+      const button = card.querySelector('button, a');
+      const link =
+        button?.getAttribute('onclick') ||
+        button?.getAttribute('href') ||
+        '';
 
-  fs.writeFileSync(`data-${date}.json`, JSON.stringify(cards, null, 2));
-  console.log(`Scraped ${cards.length} items:`, cards);
+      return { title, dateTime, link };
+    });
+  });
+
+  console.log(`found ${events.length} event(s)`);
+  console.log(events);
+
+  fs.writeFileSync(`events-${easternNow}.json`, JSON.stringify(events, null, 2));
+
+  const html = await page.content();
+  fs.writeFileSync('debug.html', html);
 
   await browser.close();
 })();
