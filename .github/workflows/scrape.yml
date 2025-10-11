@@ -35,24 +35,17 @@ jobs:
         run: node scrape.mjs ${{ github.event.inputs.date }}
 
       - name: Commit and push updated ice_times.json
+  
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          echo "testing token access"
-          git ls-remote https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy || exit 1
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "setting up git"
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email github-actions@github.com
+          git fetch origin main
+          git checkout main
 
-          echo "fetching latest main"
-          git fetch origin
-          git reset --hard origin/main
-
-          echo "committing changes"
           git add ice_times.json
-          git commit -m "Update ice times [auto]" || echo "No changes to commit"
-
-          echo "pushing to main"
-          git push https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy HEAD:main
-
+          git diff --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update ice_times.json [auto]"
+          git push https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy main
