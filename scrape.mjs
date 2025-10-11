@@ -1,60 +1,50 @@
 import { chromium } from 'playwright';
-import fs from 'fs';
+import fs from 'fs/promises';
 
-const now = new Date();
-const easternNow = new Intl.DateTimeFormat('en-CA', {
+const easternDate = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/New_York',
   year: 'numeric',
   month: '2-digit',
-  day: '2-digit',
-}).format(now).replaceAll('/', '-');
+  day: '2-digit'
+})
+  .format(new Date())
+  .replace(/\//g, '-');
+
+const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternDate}&&sport_ids=31`;
+
+console.log(`scraping medstar capitals iceplex from ${easternDate}`);
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternNow}&&sport_ids=31`;
-  console.log(`scraping events for ${easternNow}`);
-  console.log(`url: ${url}`);
-
   await page.goto(url, { waitUntil: 'networkidle' });
 
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-
-  try {
-    await page.waitForFunction(
-      () => document.querySelectorAll('h6').length > 0,
-      { timeout: 60000 }
-    );
-  } catch {
-    console.error('no events found - timeout 60s.');
-    await browser.close();
-    process.exit(0);
-  }
+  await page.waitForSelector('.card-body', { timeout: 60000 }).catch(() => null);
 
   const events = await page.evaluate(() => {
-    const iceTimes = document.querySelectorAll('.card-body');
-    return Array.from(iceTimes).map(iceTime => {
-      const title = iceTime.querySelector('.flex-grow-1 text-truncate mb-0 mr-2')?.innerText.trim() || '';
-      const time = iceTime.querySelector('.ng-tns-c8-2')?.innerText.trim() || '';
-      const date = new Date();
-      const button = iceTime.querySelector('.btn btn-sm btn-block rounded-pill mt-2 mb-2 btn-primary');
-      const link =
-        button?.getAttribute('onclick') ||
-        button?.getAttribute('href') ||
-        '';
-
-      return { title, time, date, link };
-    });
+    const cards = document.querySelectorAll('.card-body');
+    return Array.from(cards).map(card => ({
+      title:
+        card.querySelector('h6.flex-grow-1.text-truncate.mb-0.mr-2')?.innerText.trim() ||
+        card.querySelector('h6')?.innerText.trim() ||
+        '',
+      time:
+        card.querySelector('.d-flex.w-100.justify-content-between div')?.innerText.trim() ||
+        '',
+      price:
+        card.querySelector('dash-product-price')?.innerText.trim() ||
+        ''
+    }));
   });
 
-  console.log(`found ${events.length} event(s)`);
-  console.log(events);
+  const results = events
+    .filter(e => e.title || e.time || e.price)
+    .map(e => ({ ...e, link: url }));
 
-  fs.writeFileSync(`events-${easternNow}.json`, JSON.stringify(events, null, 2));
+  console.log(`found ${results.length} event(s)`);
+  console.log(results);
 
-  const html = await page.content();
-  fs.writeFileSync('debug.html', html);
-
+  await fs.writeFile(`events-${easternDate}.json`, JSON.stringify(results, null, 2));
   await browser.close();
 })();
