@@ -1,61 +1,79 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
+// --- Get current Eastern Time in YYYY-MM-DD ---
 const now = new Date();
 const easternNow = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/New_York',
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
-}).format(now).replaceAll('/', '-');
+})
+  .format(now)
+  .replace(/\//g, '-'); // safer than replaceAll for Node compatibility
 
-const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternNow}&&sport_ids=31`;
-
+// --- Main scraper ---
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  console.log(`scraping medstar capitals iceplex for ${easternNow}`);
-  console.log(`URL: ${url}`);
+  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternNow}&&sport_ids=31`;
+  console.log(`scraping events for ${easternNow}`);
+  console.log(`url: ${url}`);
 
   await page.goto(url, { waitUntil: 'networkidle' });
 
-  await page.waitForSelector('.ds-calendar-day', { timeout: 60000 });
-
-  const easternDay = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', day: '2-digit' });
-  await page.evaluate(day => {
-    const dayCell = Array.from(document.querySelectorAll('.ds-calendar-day'))
-      .find(el => el.innerText.trim() === day);
-    dayCell?.click();
-  }, easternDay);
-
-  await page.waitForTimeout(2000);
+  // Scroll to trigger lazy loading
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
   try {
-    await page.waitForSelector('.card-body', { timeout: 60000 });
+    // Wait for events (h6 = event titles)
+    await page.waitForFunction(
+      () => document.querySelectorAll('h6').length > 0,
+      { timeout: 60000 }
+    );
   } catch {
-    console.error('no events found - timeout 60s.');
+    console.error('no events found - timeout (60s).');
     await browser.close();
     process.exit(0);
   }
 
-  const events = await page.evaluate((pageUrl) => {
-    const cards = document.querySelectorAll('.card-body');
-    return Array.from(cards)
-      .map(card => {
-        const title = card.querySelector('h6')?.innerText.trim() || '';
-        const time = card.querySelector('.ng-star-inserted')?.innerText.trim() || '';
-        const price = card.querySelector('.btn-primary')?.innerText.includes('Add to cart') 
-          ? '$20.00' : '';
-        return { title, time, price, link: pageUrl };
-      })
-      .filter(e => e.title && e.time);
-  }, url);
+  // --- Extract data ---
+  const events = await page.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll('.card-body'));
+    const parsed = [];
+
+    for (const card of cards) {
+      const title =
+        card.querySelector('.event-title, h5, h6, .card-title')?.innerText?.trim() || '';
+      const time =
+        card.querySelector('.event-time, .time, .text-muted')?.innerText?.trim() || '';
+      const price =
+        card.querySelector('.event-price, .price, strong')?.innerText?.trim() || '';
+
+      if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
+        parsed.push({
+          title,
+          time,
+          price,
+          link: window.location.href,
+        });
+      }
+    }
+
+    return parsed;
+  });
 
   console.log(`found ${events.length} event(s)`);
   console.log(events);
 
-  fs.writeFileSync(`ice_times.json`, JSON.stringify(events, null, 2));
+  // --- Save results ---
+  fs.writeFileSync('ice_times.json', JSON.stringify(events, null, 2));
+  console.log('saved to ice_times.json');
+
+  // Save HTML snapshot for debugging
+  const html = await page.content();
+  fs.writeFileSync('debug.html', html);
 
   await browser.close();
 })();
