@@ -37,7 +37,7 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
     return Array.from(iceTimes).map(iceTime => {
       const title = iceTime.querySelector('.flex-grow-1 text-truncate mb-0 mr-2')?.innerText.trim() || '';
       const time = iceTime.querySelector('.ng-tns-c8-2')?.innerText.trim() || '';
-      const date = easternNow;
+      const date = new Date();
       const button = iceTime.querySelector('.btn btn-sm btn-block rounded-pill mt-2 mb-2 btn-primary');
       const link =
         button?.getAttribute('onclick') ||
