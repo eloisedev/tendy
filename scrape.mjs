@@ -1,7 +1,6 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
-// --- Get current Eastern Time in YYYY-MM-DD ---
 const now = new Date();
 const easternNow = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/New_York',
@@ -10,9 +9,8 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 })
   .format(now)
-  .replace(/\//g, '-'); // safer than replaceAll for Node compatibility
+  .replace(/\//g, '-');
 
-// --- Main scraper ---
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -23,11 +21,9 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
 
   await page.goto(url, { waitUntil: 'networkidle' });
 
-  // Scroll to trigger lazy loading
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
   try {
-    // Wait for events (h6 = event titles)
     await page.waitForFunction(
       () => document.querySelectorAll('h6').length > 0,
       { timeout: 60000 }
@@ -38,7 +34,6 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
     process.exit(0);
   }
 
-  // --- Extract data ---
   const events = await page.evaluate(() => {
     const cards = Array.from(document.querySelectorAll('.card-body'));
     const parsed = [];
@@ -67,11 +62,9 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
   console.log(`found ${events.length} event(s)`);
   console.log(events);
 
-  // --- Save results ---
   fs.writeFileSync('ice_times.json', JSON.stringify(events, null, 2));
   console.log('saved to ice_times.json');
 
-  // Save HTML snapshot for debugging
   const html = await page.content();
   fs.writeFileSync('debug.html', html);
 
