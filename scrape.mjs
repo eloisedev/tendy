@@ -15,7 +15,7 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-10-18&&sport_ids=31`;
+  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-10-11&&sport_ids=31`;
   console.log(`scraping events for ${easternNow}`);
   console.log(`url: ${url}`);
 
@@ -39,14 +39,25 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
     const parsed = [];
 
     for (const card of cards) {
+
+      // [
+      //   {
+      //     "title": "Stick n Shoot-Morning",
+      //     "time": "$20.00",
+      //     "price": "",
+      //     "location": "Stick n Shoot-Morning",
+      //     "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-10-18&&sport_ids=31"
+      //   }
+      // ]
+      
       const title =
         card.querySelector('.event-title, h5, h6, .card-title, .flex-grow-1 text-truncate mb-0 mr-2')?.innerText?.trim() || '';
       const time =
-        card.querySelector('.event-time, .time, .text-muted, .ng-tns-c8-2')?.innerText?.trim() || '';
+        card.querySelector('.d-flex w-100 justify-content-between, .ng-tns-c8-2')?.innerText?.trim() || '';
       const price =
-        card.querySelector('.event-price, .price, strong, .mb-0 ng-tns-c8-2 ng-star-inserted')?.innerText?.trim() || '';
+        card.querySelector('.text-muted, .ng-tns-c8-2')?.innerText?.trim() || '';
       const location = 
-        card.querySelector('.flex-grow-1')?.innerText?.trim() || '';
+        "Medstar Capitals Iceplex";
 
       if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
         parsed.push({
