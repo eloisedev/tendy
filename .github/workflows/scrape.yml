@@ -37,7 +37,7 @@ jobs:
       - name: Commit and push updated ice_times.json
   
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PATV2: ${{ secrets.GH_PATV2 }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -46,6 +46,6 @@ jobs:
           git checkout main
 
           git add ice_times.json
-          git diff --quiet && echo "No changes to commit" && exit 0
-          git commit -m "Update ice_times.json [auto]"
-          git push https://x-access-token:${GH_PAT}@github.com/eloisedev/tendy main
+          git diff --quiet && echo "no changes to commit" && exit 0
+          git commit -m "update ice_times.json [auto]"
+          git push https://x-access-token:${GH_PATV2}@github.com/eloisedev/tendy main
