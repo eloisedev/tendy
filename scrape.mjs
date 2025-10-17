@@ -40,18 +40,23 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
 
     for (const card of cards) {
       const title =
-        card.querySelector('.event-title, h5, h6, .card-title')?.innerText?.trim() || '';
+        card.querySelector('.event-title, h5, h6, .card-title', '.flex-grow-1 text-truncate mb-0 mr-2')?.innerText?.trim() || '';
       const time =
-        card.querySelector('.event-time, .time, .text-muted')?.innerText?.trim() || '';
+        card.querySelector('.event-time, .time, .text-muted', '.ng-tns-c8-2')?.innerText?.trim() || '';
       const price =
-        card.querySelector('.event-price, .price, strong')?.innerText?.trim() || '';
+        card.querySelector('.event-price, .price, strong', '.mb-0 ng-tns-c8-2 ng-star-inserted'')?.innerText?.trim() || '';
+      const location = 
+        card.querySelector('.flex-grow-1')?.innerText?.trim() || '';
 
+      if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
         parsed.push({
           title,
           time,
           price,
+          location,
           link: window.location.href,
         });
+      }
     }
 
     return parsed;
