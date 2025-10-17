@@ -65,7 +65,6 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
           time,
           price,
           location,
-          date: easternNow,
           link: window.location.href,
         });
       }
