@@ -46,14 +46,12 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
       const price =
         card.querySelector('.event-price, .price, strong')?.innerText?.trim() || '';
 
-      if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
         parsed.push({
           title,
           time,
           price,
           link: window.location.href,
         });
-      }
     }
 
     return parsed;
