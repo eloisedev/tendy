@@ -53,7 +53,7 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
       const title =
         card.querySelector('.event-title, h5, h6, .card-title, .flex-grow-1 text-truncate mb-0 mr-2')?.innerText?.trim() || '';
       const time =
-        card.querySelector('.d-flex w-100 justify-content-between, .ng-tns-c8-2')?.innerText?.trim() || '';
+        card.querySelector('div.d-flex w-100 justify-content-between > div.ng-tns-c8-2')?.innerText?.trim() || '';
       const price =
         card.querySelector('.text-muted, .ng-tns-c8-2')?.innerText?.trim() || '';
       const location = 
@@ -65,6 +65,7 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
           time,
           price,
           location,
+          date: easternNow,
           link: window.location.href,
         });
       }
