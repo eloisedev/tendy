@@ -14,7 +14,7 @@
       const iceTimes = await res.json();
 
       const list = document.getElementById('iceTimesList');
-      list.innerHTML = ''; // Clear existing
+      list.innerHTML = '';
 
       iceTimes.forEach(event => {
         const li = document.createElement('li');
