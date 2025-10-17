@@ -15,7 +15,7 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-10-18&&sport_ids=31`;
+  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternNow}&&sport_ids=31`;
   console.log(`scraping events for ${easternNow}`);
   console.log(`url: ${url}`);
 
