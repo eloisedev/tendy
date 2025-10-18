@@ -18,7 +18,7 @@
 
       iceTimes.forEach(event => {
         const li = document.createElement('li');
-        li.textContent = `${event.date} - ${event.name} at ${event.location}, Time: ${event.time}`;
+        li.textContent = `${event.title} - ${event.price} at ${event.location}, Time: ${event.time}`;
         list.appendChild(li);
       });
     }
