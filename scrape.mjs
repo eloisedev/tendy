@@ -145,14 +145,3 @@ function pwDateFormat(date) {
 
   await browser.close();
 })();
-  console.log(`found ${events.length} event(s)`);
-  console.log(events);
-
-  fs.writeFileSync('ice_times.json', JSON.stringify(events, null, 2));
-  console.log('saved to ice_times.json');
-
-  const html = await page.content();
-  fs.writeFileSync('debug.html', html);
-
-  await browser.close();
-})();
