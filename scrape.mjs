@@ -47,7 +47,7 @@ function pwDateFormat(date) {
     for (const card of cards) {
       const title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
       const time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
-      const price = card.querySelector('.text-muted')?.innerText?.trim() || '';
+      const price = "$20.00";
       const location = 'MedStar Capitals Iceplex';
 
       if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
@@ -112,7 +112,7 @@ function pwDateFormat(date) {
     for (const card of cards) {
       const title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
       const time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
-      const price = card.querySelector('.text-muted')?.innerText?.trim() || '';
+      const price = "$20.00";
       const location = 'Ashburn Ice house';
 
       if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
