@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 
 const now = new Date();
-const easternNow = new Intl.DateTimeFormat('en-CA', {
+const msDateFormt = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/New_York',
   year: 'numeric',
   month: '2-digit',
@@ -11,27 +11,31 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
   .format(now)
   .replace(/\//g, '-');
 
+// format pw date to srape right thing 
+function pwDateFormat(date) {
+  const options = { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'America/New_York' };
+  return new Intl.DateTimeFormat('en-US', options)
+    .format(date)
+    .replace(',', '')
+    .replace(/(\d)( )(\d)/, '$1 0$3'); 
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  const url = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${easternNow}&&sport_ids=31`;
-  console.log(`scraping events for ${easternNow}`);
-  console.log(`url: ${url}`);
+  // medstar scrape
+  const msUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${msDateFormat}&&sport_ids=31`;
+  console.log(`scraping events for ${msDateFormat}`);
+  console.log(`url: ${msUrl}`);
 
-  await page.goto(url, { waitUntil: 'networkidle' });
-
+  await page.goto(msUrl, { waitUntil: 'networkidle' });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
   try {
-    await page.waitForFunction(
-      () => document.querySelectorAll('h6').length > 0,
-      { timeout: 60000 }
-    );
+    await page.waitForFunction(() => document.querySelectorAll('h6').length > 0, { timeout: 60000 });
   } catch {
     console.error('no events found - timeout (60s).');
-    await browser.close();
-    process.exit(0);
   }
 
   const msEvents = await page.evaluate(() => {
@@ -39,74 +43,64 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
     const parsed = [];
 
     for (const card of cards) {
- 
-      const title =
-        card.querySelector('.event-title, h5, h6, .card-title, .flex-grow-1 text-truncate mb-0 mr-2')?.innerText?.trim() || '';
-      const time =
-        card.querySelector(".d-flex.w-100.justify-content-between > div")?.innerText?.trim() || '';
-      const price =
-        card.querySelector('.text-muted, .ng-tns-c8-2')?.innerText?.trim() || '';
-      const location = 
-        "Medstar Capitals Iceplex";
+      const title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
+      const time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
+      const price = card.querySelector('.text-muted')?.innerText?.trim() || '';
+      const location = 'MedStar Capitals Iceplex';
 
-      if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
-        parsed.push({
-          title,
-          time,
-          price,
-          location,
-          link: window.location.href,
-        });
+      if (title) {
+        parsed.push({ title, time, price, location, link: window.location.href });
       }
     }
-
     return parsed;
   });
 
   console.log(`found ${msEvents.length} event(s) for medstar`);
-  console.log(msEvents);
 
-  url = "https://www.frontline-connect.com/monthlysched.cfm?fac=pwice&facid=1&session=3&month=11"
-  await page.goto(url, { waitUntil: 'networkidle' });
-  /*
-  var tableData = await page.getByTitle('Nov 07 2025').all();
-  for(var session of tableData) {
-      var sessionData = await session.locator(".sessdiv");
-      var sessionTimes = await sessionData.innerText();
-      
-  } */
-  const pwEvents = await page.evaluate(() => {
+  // prince william scrape
+  const pwUrl = 'https://www.frontline-connect.com/monthlysched.cfm?fac=pwice&facid=1&session=3';
+  console.log(`scraping Prince William Ice Center: ${pwUrl}`);
+  await page.goto(pwUrl, { waitUntil: 'networkidle' });
+
+  const today = pwDateFormat(now); 
+  console.log(`Looking for day cell: ${today}`);
+
+  const pwEvents = await page.evaluate((today) => {
     const parsed = [];
-    
-    var tableData = await page.getByTitle('Nov 10 2025').all();
-    for (var session of tableData) {
- 
-      const title = 
-        "Stick and shoot";
-      var sessionData = 
-        await session.locator(".sessdiv");
-      const time = 
-        await sessionData.innerText();
-      const price = 
-        "$17.00"
-      const location = 
-        "Medstar Capitals Iceplex";
-      
-      parsed.push({
-        title,
-        time,
-        price,
-        location,
-        link: window.location.href,
+    const dayCell = document.querySelector(`td[title="${today}"]`);
+    if (!dayCell) return parsed;
+
+    const sessions = Array.from(dayCell.querySelectorAll('.sessdiv'));
+    for (const s of sessions) {
+      const text = s.innerText.trim();
+      if (/stick/i.test(text)) {
+        parsed.push({
+          title: 'Stick and Shoot',
+          time: text,
+          price: '$17.00',
+          location: 'Prince William Ice Center',
+          link: window.location.href,
         });
+      }
     }
     return parsed;
-  });
-  
-  console.log(`found ${pwEvents.length} event(s) for medstar`);
-  console.log(pwEvents);
-  
-  fs.writeFileSync('ice_times.json', JSON.stringify(msEvents, pwEvents, null, 2));
+  }, today);
+
+  console.log(`found ${pwEvents.length} event(s) for Prince William`);
+
+  // save results
+  let existing = [];
+  if (fs.existsSync('ice_times.json')) {
+    try {
+      existing = JSON.parse(fs.readFileSync('ice_times.json', 'utf8'));
+      if (!Array.isArray(existing)) existing = [];
+    } catch {
+      existing = [];
+    }
+  }
+
+  const allEvents = [...existing, ...msEvents, ...pwEvents];
+  fs.writeFileSync('ice_times.json', JSON.stringify(allEvents, null, 2));
   console.log('saved to ice_times.json');
 
   const html = await page.content();
