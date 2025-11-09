@@ -11,10 +11,13 @@ The site is currently being made at [https://eloisedev.github.io/tendy/](https:/
 This site pulls from local rinks event schedules to allow all event information to be easily displayed in one interface, making finding ice time much easier. 
 
 Currently being pulled from:  
-Medstar capitals Iceplex  
-Skatequest (TBA)  
-Prince William Ice center (TBA)  
-Ashburn Ice house (TBA)  
+Medstar capitals Iceplex
+Prince William Ice center
+Ashburn Ice house
+
+To be added:
+Skatequest (TBA)
+Mount Vernon Rec center (TBA)
 Tucker road Ice rink (TBA)
 
 ## Contact me
