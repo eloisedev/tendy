@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 
 const now = new Date();
-const msDateFormt = new Intl.DateTimeFormat('en-CA', {
+const msDateFormat = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/New_York',
   year: 'numeric',
   month: '2-digit',
