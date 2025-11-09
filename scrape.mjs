@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 
 const now = new Date();
-const msDateFormat = new Intl.DateTimeFormat('en-CA', {
+const daysmartDateFormat = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/New_York',
   year: 'numeric',
   month: '2-digit',
@@ -27,8 +27,8 @@ function pwDateFormat(date) {
   const page = await browser.newPage();
 
   // medstar scrape
-  const msUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${msDateFormat}&&sport_ids=31`;
-  console.log(`scraping events for ${msDateFormat}`);
+  const msUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${daysmartDateFormat}&&sport_ids=31`;
+  console.log(`scraping events in medstar ${daysmartDateFormat}`);
   console.log(`url: ${msUrl}`);
 
   await page.goto(msUrl, { waitUntil: 'networkidle' });
@@ -61,11 +61,12 @@ function pwDateFormat(date) {
 
   // prince william scrape
   const pwUrl = 'https://www.frontline-connect.com/monthlysched.cfm?fac=pwice&facid=1&session=3';
-  console.log(`scraping Prince William Ice Center: ${pwUrl}`);
+  console.log(`scraping events in prince william ${daysmartDateFormat}`);
+  console.log(`url: ${pwUrl}`);
   await page.goto(pwUrl, { waitUntil: 'networkidle' });
 
   const today = pwDateFormat(now); 
-  console.log(`Looking for day cell: ${today}`);
+  //looking for current day day cell
 
   const pwEvents = await page.evaluate((today) => {
     const parsed = [];
@@ -90,6 +91,40 @@ function pwDateFormat(date) {
 
   console.log(`found ${pwEvents.length} event(s) for Prince William`);
 
+  // ashburn scrape
+  const abUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=${daysmartDateFormat}&&sport_ids=30`;
+  console.log(`scraping events in ashburn ${daysmartDateFormat}`);
+  console.log(`url: ${abUrl}`);
+
+  await page.goto(abUrl, { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+
+  try {
+    await page.waitForFunction(() => document.querySelectorAll('h6').length > 0, { timeout: 60000 });
+  } catch {
+    console.error('no events found - timeout (60s).');
+  }
+
+  const abEvents = await page.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll('.card-body'));
+    const parsed = [];
+
+    for (const card of cards) {
+      const title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
+      const time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
+      const price = card.querySelector('.text-muted')?.innerText?.trim() || '';
+      const location = 'Ashburn Ice house';
+
+      if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
+        parsed.push({ title, time, price, location, link: window.location.href });
+      }
+    }
+    return parsed;
+  });
+
+  console.log(`found ${msEvents.length} event(s) for ashburn`);
+
+
   // save results
   let existing = [];
   if (fs.existsSync('ice_times.json')) {
@@ -101,8 +136,19 @@ function pwDateFormat(date) {
     }
   }
 
-  const allEvents = [...existing, ...msEvents, ...pwEvents];
+  const allEvents = [...existing, ...msEvents, ...pwEvents, ...abEvents];
   fs.writeFileSync('ice_times.json', JSON.stringify(allEvents, null, 2));
+  console.log('saved to ice_times.json');
+
+  const html = await page.content();
+  fs.writeFileSync('debug.html', html);
+
+  await browser.close();
+})();
+  console.log(`found ${events.length} event(s)`);
+  console.log(events);
+
+  fs.writeFileSync('ice_times.json', JSON.stringify(events, null, 2));
   console.log('saved to ice_times.json');
 
   const html = await page.content();
