@@ -551,5 +551,19 @@
     "price": "24/34 Registered",
     "location": "MedStar Capitals Iceplex",
     "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-09&sport_ids=31&"
+  },
+  {
+    "title": "Stick n Shoot-Morning",
+    "time": "10:20am - 11:30am",
+    "price": "28/34 Registered",
+    "location": "MedStar Capitals Iceplex",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-09&&sport_ids=31"
+  },
+  {
+    "title": "Stick n Shoot- Weekends",
+    "time": "5:30pm - 6:40pm",
+    "price": "1/30 Registered",
+    "location": "Ashburn Ice house",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-09&&sport_ids=30"
   }
 ]
