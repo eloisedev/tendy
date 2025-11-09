@@ -34,7 +34,7 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
     process.exit(0);
   }
 
-  const events = await page.evaluate(() => {
+  const msEvents = await page.evaluate(() => {
     const cards = Array.from(document.querySelectorAll('.card-body'));
     const parsed = [];
 
@@ -63,10 +63,50 @@ const easternNow = new Intl.DateTimeFormat('en-CA', {
     return parsed;
   });
 
-  console.log(`found ${events.length} event(s)`);
-  console.log(events);
+  console.log(`found ${msEvents.length} event(s) for medstar`);
+  console.log(msEvents);
 
-  fs.writeFileSync('ice_times.json', JSON.stringify(events, null, 2));
+  url = "https://www.frontline-connect.com/monthlysched.cfm?fac=pwice&facid=1&session=3&month=11"
+  await page.goto(url, { waitUntil: 'networkidle' });
+  /*
+  var tableData = await page.getByTitle('Nov 07 2025').all();
+  for(var session of tableData) {
+      var sessionData = await session.locator(".sessdiv");
+      var sessionTimes = await sessionData.innerText();
+      
+  } */
+  const pwEvents = await page.evaluate(() => {
+    const parsed = [];
+    
+    var tableData = await page.getByTitle('Nov 10 2025').all();
+    for (var session of tableData) {
+ 
+      const title = 
+        "Stick and shoot";
+      var sessionData = 
+        await session.locator(".sessdiv");
+      const time = 
+        await sessionData.innerText();
+      const price = 
+        "$17.00"
+      const location = 
+        "Medstar Capitals Iceplex";
+      
+      parsed.push({
+        title,
+        time,
+        price,
+        location,
+        link: window.location.href,
+        });
+    }
+    return parsed;
+  });
+  
+  console.log(`found ${pwEvents.length} event(s) for medstar`);
+  console.log(pwEvents);
+  
+  fs.writeFileSync('ice_times.json', JSON.stringify(msEvents, pwEvents, null, 2));
   console.log('saved to ice_times.json');
 
   const html = await page.content();
