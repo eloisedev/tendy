@@ -11,7 +11,7 @@ const daysmartDateFormat = new Intl.DateTimeFormat('en-CA', {
   .format(now)
   .replace(/\//g, '-');
 
-// format pw date to srape right thing 
+// format pw date correctly
 function pwDateFormat(date) {
   const options = { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'America/New_York' };
   const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(date);
@@ -21,14 +21,13 @@ function pwDateFormat(date) {
   return `${month} ${day} ${year}`;
 }
 
-
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  // medstar scrape
+  //medstar
   const msUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${daysmartDateFormat}&&sport_ids=31`;
-  console.log(`scraping events in medstar ${daysmartDateFormat}`);
+  console.log(`scraping MedStar for ${daysmartDateFormat}`);
   console.log(`url: ${msUrl}`);
 
   await page.goto(msUrl, { waitUntil: 'networkidle' });
@@ -37,7 +36,7 @@ function pwDateFormat(date) {
   try {
     await page.waitForFunction(() => document.querySelectorAll('h6').length > 0, { timeout: 60000 });
   } catch {
-    console.error('no events found - timeout (60s).');
+    console.error('no MedStar events found - timeout (60s).');
   }
 
   const msEvents = await page.evaluate(() => {
@@ -45,8 +44,11 @@ function pwDateFormat(date) {
     const parsed = [];
 
     for (const card of cards) {
-      const title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
-      const time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
+      let title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
+      if (title.includes('-')) title = title.split('-')[0].trim();
+      let time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
+      if (time.includes('-')) time = time.split('-')[0].trim();
+
       const price = "$20.00";
       const location = 'MedStar Capitals Iceplex';
 
@@ -57,16 +59,15 @@ function pwDateFormat(date) {
     return parsed;
   });
 
-  console.log(`found ${msEvents.length} event(s) for medstar`);
+  console.log(`found ${msEvents.length} MedStar event(s)`);
 
-  // prince william scrape
+  //prince william
   const pwUrl = 'https://www.frontline-connect.com/monthlysched.cfm?fac=pwice&facid=1&session=3';
-  console.log(`scraping events in prince william ${daysmartDateFormat}`);
+  console.log(`scraping Prince William for ${daysmartDateFormat}`);
   console.log(`url: ${pwUrl}`);
   await page.goto(pwUrl, { waitUntil: 'networkidle' });
 
-  const today = pwDateFormat(now); 
-  //looking for current day day cell
+  const today = pwDateFormat(now);
 
   const pwEvents = await page.evaluate((today) => {
     const parsed = [];
@@ -75,8 +76,11 @@ function pwDateFormat(date) {
 
     const sessions = Array.from(dayCell.querySelectorAll('.sessdiv'));
     for (const s of sessions) {
-      const text = s.innerText.trim();
+      let text = s.innerText.trim();
+
       if (/stick/i.test(text)) {
+        if (text.includes('-')) text = text.split('-')[0].trim();
+
         parsed.push({
           title: 'Stick and Shoot',
           time: text,
@@ -89,11 +93,11 @@ function pwDateFormat(date) {
     return parsed;
   }, today);
 
-  console.log(`found ${pwEvents.length} event(s) for Prince William`);
+  console.log(`found ${pwEvents.length} Prince William event(s)`);
 
-  // ashburn scrape
+  //ashburn
   const abUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=${daysmartDateFormat}&&sport_ids=30`;
-  console.log(`scraping events in ashburn ${daysmartDateFormat}`);
+  console.log(`scraping Ashburn for ${daysmartDateFormat}`);
   console.log(`url: ${abUrl}`);
 
   await page.goto(abUrl, { waitUntil: 'networkidle' });
@@ -102,7 +106,7 @@ function pwDateFormat(date) {
   try {
     await page.waitForFunction(() => document.querySelectorAll('h6').length > 0, { timeout: 60000 });
   } catch {
-    console.error('no events found - timeout (60s).');
+    console.error('no Ashburn events found - timeout (60s).');
   }
 
   const abEvents = await page.evaluate(() => {
@@ -110,10 +114,13 @@ function pwDateFormat(date) {
     const parsed = [];
 
     for (const card of cards) {
-      const title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
-      const time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
+      let title = card.querySelector('h5, h6, .card-title')?.innerText?.trim() || '';
+      if (title.includes('-')) title = title.split('-')[0].trim();
+      let time = card.querySelector('.d-flex.w-100.justify-content-between > div')?.innerText?.trim() || '';
+      if (time.includes('-')) time = time.split('-')[0].trim();
+
       const price = "$20.00";
-      const location = 'Ashburn Ice house';
+      const location = 'Ashburn Ice House';
 
       if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
         parsed.push({ title, time, price, location, link: window.location.href });
@@ -122,10 +129,9 @@ function pwDateFormat(date) {
     return parsed;
   });
 
-  console.log(`found ${msEvents.length} event(s) for ashburn`);
+  console.log(`found ${abEvents.length} Ashburn event(s)`);
 
-
-  // save results
+  //save results
   let existing = [];
   if (fs.existsSync('ice_times.json')) {
     try {
