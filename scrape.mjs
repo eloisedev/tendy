@@ -14,11 +14,13 @@ const msDateFormat = new Intl.DateTimeFormat('en-CA', {
 // format pw date to srape right thing 
 function pwDateFormat(date) {
   const options = { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'America/New_York' };
-  return new Intl.DateTimeFormat('en-US', options)
-    .format(date)
-    .replace(',', '')
-    .replace(/(\d)( )(\d)/, '$1 0$3'); 
+  const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(date);
+  const month = parts.find(p => p.type === 'month')?.value;
+  const day = parts.find(p => p.type === 'day')?.value.padStart(2, '0');
+  const year = parts.find(p => p.type === 'year')?.value;
+  return `${month} ${day} ${year}`;
 }
+
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -48,7 +50,7 @@ function pwDateFormat(date) {
       const price = card.querySelector('.text-muted')?.innerText?.trim() || '';
       const location = 'MedStar Capitals Iceplex';
 
-      if (title) {
+      if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
         parsed.push({ title, time, price, location, link: window.location.href });
       }
     }
