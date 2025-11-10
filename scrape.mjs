@@ -51,9 +51,10 @@ function pwDateFormat(date) {
 
       const price = "$20.00";
       const location = 'MedStar Capitals Iceplex';
+      const date = daysmartDateFormat(now);
 
       if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
-        parsed.push({ title, time, price, location, link: window.location.href });
+        parsed.push({ title, time, price, location, link: window.location.href, date });
       }
     }
     return parsed;
@@ -83,10 +84,11 @@ function pwDateFormat(date) {
 
         parsed.push({
           title: 'Stick and Shoot',
-          time: text,
+          time: text;
           price: '$17.00',
           location: 'Prince William Ice Center',
           link: window.location.href,
+          date: daysmartDateFormat(now)
         });
       }
     }
@@ -121,9 +123,10 @@ function pwDateFormat(date) {
 
       const price = "$20.00";
       const location = 'Ashburn Ice House';
+      const date = daysmartDateFormat(now);
 
       if (title && !/Oct|Nov|Dec|Jan/i.test(title)) {
-        parsed.push({ title, time, price, location, link: window.location.href });
+        parsed.push({ title, time, price, location, link: window.location.href, date });
       }
     }
     return parsed;
