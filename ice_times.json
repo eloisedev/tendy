@@ -12,5 +12,12 @@
     "price": "$20.00",
     "location": "Ashburn Ice House",
     "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-09&&sport_ids=30"
+  },
+  {
+    "title": "Stick n Shoot",
+    "time": "12:00pm",
+    "price": "$20.00",
+    "location": "Ashburn Ice House",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-10&&sport_ids=30"
   }
 ]
