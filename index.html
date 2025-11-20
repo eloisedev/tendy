@@ -5,8 +5,11 @@
   <title>Ice Times in NOVA</title>
 </head>
 <body>
-  <h1>Ice Times</h1>
+  <h1>Ice times in NOVA</h1>
+  <p>disclaimer: this website sucks currently but im working on making it look good!</p>
+  <p>find me at: <a href="https://github.com/eloisedev/tendy">github</a> or <a href="mailto:eloiseedevito@gmail.com">email me</a></p>
   <ul id="iceTimesList"></ul>
+  <p> v0.1beta</p>
 
   <script>
     async function fetchIceTimes() {
@@ -18,7 +21,7 @@
 
       iceTimes.forEach(event => {
         const li = document.createElement('li');
-        li.textContent = `${event.title} - ${event.price} at ${event.location}, Time: ${event.time}`;
+        li.textContent = `${event.title} - ${event.date} at ${event.location}, Time: ${event.time}`;
         list.appendChild(li);
       });
     }
