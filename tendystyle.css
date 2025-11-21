@@ -1,7 +1,6 @@
 .left {
     display: flex;
     width: 30vw;
-    height: 85vw;
 }
 body {
     display: flex;
@@ -9,12 +8,12 @@ body {
     align-items: center;
     flex-direction: column;
     font-family: "Stack Sans Text", sans-serif;
+    margin: 10%;
 }
 
 .right {
     display: flex;
     width: 30vw;
-    height: 85vw;
 }
 .top {
     display: flex;
@@ -32,12 +31,25 @@ body {
 #dates {
     cursor: pointer;
 }
+.date-item:hover {
+    color: #cecece;
+    transition: 0.3s;
+}
+
 select{
     cursor: pointer;
 }
+footer {
+    bottom: 0;
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    z-index: 1000;
+  }
 @media screen and (max-width: 600px) {
     .left, .right {
         width: 50vw;
+        height: 160%;
     }
     .top {
         display: flex;
@@ -51,5 +63,4 @@ select{
     select{
         width: 20%;
     }
-    
 }

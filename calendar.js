@@ -12,7 +12,6 @@ function initializeUI() {
     const uniqueDates = [...new Set(events.map(e => e.date))].sort();
     const datesDiv = document.getElementById("dates");
 
-    // build date list
     uniqueDates.forEach(date => {
         const el = document.createElement("div");
         el.className = "date-item";
@@ -22,7 +21,6 @@ function initializeUI() {
         datesDiv.appendChild(el);
     });
 
-    // build rink filter
     const rinkSelect = document.getElementById("rinkFilter");
     const uniqueRinks = [...new Set(events.map(e => e.location))].sort();
     uniqueRinks.forEach(r => {
@@ -53,7 +51,6 @@ function renderEvents() {
 
     let filtered = events.filter(e => e.date === selectedDate);
 
-    // filters
     const rinkVal = document.getElementById("rinkFilter").value;
     const timeVal = document.getElementById("timeFilter").value;
 
@@ -70,7 +67,6 @@ function renderEvents() {
         });
     }
 
-    // render
     filtered.forEach(e => {
         const card = document.createElement("div");
         card.className = "event-card";
@@ -96,6 +92,5 @@ function parseTime(str) {
     return hour + min / 60;
 }
 
-// start
 loadEvents();
 
