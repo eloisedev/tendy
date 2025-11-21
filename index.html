@@ -5,31 +5,67 @@
      crossorigin="anonymous"></script>
   <meta name="google-adsense-account" content="ca-pub-2131320736471821">
   <meta charset="UTF-8" />
-  <title>Ice Times in NOVA</title>
+  <link rel="stylesheet" href="tendystyle.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,100..900;1,100..900&family=Stack+Sans+Text:wght@200..700&display=swap" rel="stylesheet">
+  <title>Tendy Ice times</title>
 </head>
-<body>
-  <h1>Ice times in NOVA</h1>
-  <p>disclaimer: this website sucks currently but im working on making it look good!</p>
-  <p>find me at: <a href="https://github.com/eloisedev/tendy">github</a> or <a href="mailto:eloiseedevito@gmail.com">email me</a></p>
-  <ul id="iceTimesList"></ul>
-  <p> v0.1beta</p>
-
-  <script>
-    async function fetchIceTimes() {
-      const res = await fetch('ice_times.json');
-      const iceTimes = await res.json();
-
-      const list = document.getElementById('iceTimesList');
-      list.innerHTML = '';
-
-      iceTimes.forEach(event => {
-        const li = document.createElement('li');
-        li.textContent = `${event.title} - ${event.date} at ${event.location}, Time: ${event.time}`;
-        list.appendChild(li);
-      });
-    }
-
-    fetchIceTimes();
-  </script>
+  <body>
+    <div class="top">
+        <div id="filters">
+            <label>Rink:
+                <select id="rinkFilter">
+                    <option value="">All</option>
+                </select>
+            </label>
+    
+            <label>Time:
+                <select id="timeFilter">
+                    <option value="">All</option>
+                    <option value="morning">Morning (before 12pm)</option>
+                    <option value="afternoon">Afternoon (12pm–5pm)</option>
+                    <option value="evening">Evening (after 5pm)</option>
+                </select>
+            </label>
+        </div>
+    </div>
+    <div class="bottom">
+      <div class="left" id="main">
+        <div id="events">
+        </div>
+      </div>
+      <div class="right" id="sidebar">
+        <div id="dates"></div>
+      </div>
+    </div>
+    <!-- <div id="sidebar">
+        <h3>Dates</h3>
+        <div id="dates"></div>
+    </div>
+    
+    <div id="main">
+        <h2>Events</h2>
+    
+        <div id="filters">
+            <label>Rink:
+                <select id="rinkFilter">
+                    <option value="">All</option>
+                </select>
+            </label>
+    
+            <label>Time:
+                <select id="timeFilter">
+                    <option value="">All</option>
+                    <option value="morning">Morning (before 12pm)</option>
+                    <option value="afternoon">Afternoon (12pm–5pm)</option>
+                    <option value="evening">Evening (after 5pm)</option>
+                </select>
+            </label>
+        </div>
+    
+        <div id="events"></div>
+    </div> -->
+    <script src="calendar.js"></script>
 </body>
 </html>

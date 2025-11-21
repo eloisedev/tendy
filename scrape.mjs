@@ -1,6 +1,8 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
+console.log('starting scrape...');
+
 function daysmartDate(date) {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/New_York',
@@ -10,18 +12,15 @@ function daysmartDate(date) {
   }).format(date).replace(/\//g, '-');
 }
 
-// Helper to scrape a Daysmart location
 async function scrapeDaysmartLocation(url, locationName, dateStr) {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  console.log(`Scraping ${locationName} for ${dateStr}`);
   await page.goto(url, { waitUntil: 'networkidle' });
 
   try {
     await page.waitForSelector('.card-body', { timeout: 30000 });
   } catch {
-    console.error(`No events found for ${locationName} on ${dateStr}`);
     await browser.close();
     return [];
   }
@@ -57,7 +56,6 @@ async function scrapeDaysmartLocation(url, locationName, dateStr) {
   return events;
 }
 
-// Scrape Prince William (separate)
 async function scrapePrinceWilliam(page, dateObj) {
   const url = 'https://www.frontline-connect.com/monthlysched.cfm?fac=pwice&facid=1&session=3';
   const dateStr = daysmartDate(dateObj);
@@ -85,7 +83,7 @@ async function scrapePrinceWilliam(page, dateObj) {
       for (const s of sessions) {
         const time = s.innerText.trim().split('\n')[0];
         parsed.push({
-          title: 'Prince William',
+          title: 'Stick and shoot',
           time,
           price: '$20.00',
           location: 'Prince William Ice Center',
@@ -97,33 +95,39 @@ async function scrapePrinceWilliam(page, dateObj) {
     return parsed;
   }, dateStr);
 }
-
-// Main
 (async () => {
   let results = [];
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 8; i++) {
     const day = new Date();
     day.setDate(day.getDate() + i);
     const dateStr = daysmartDate(day);
-
-    // MedStar
+    
+    //medstar
     const msUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=${dateStr}&&sport_ids=31`;
     const msEvents = await scrapeDaysmartLocation(msUrl, "MedStar Capitals Iceplex", dateStr);
     results.push(...msEvents);
 
-    // Ashburn
+    //ashburn
     const abUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=${dateStr}&&sport_ids=30`;
     const abEvents = await scrapeDaysmartLocation(abUrl, "Ashburn Ice House", dateStr);
     results.push(...abEvents);
 
-    // Prince William
+    //prince william
     const pwEvents = await scrapePrinceWilliam(page, day);
     results.push(...pwEvents);
+
+    //skatequest
+    // const sqUrl = `https://apps.daysmartrecreation.com/dash/x/#/online/skatequest/calendar?start=${dateStr}&event_type=17&end=${dateStr}`;
+    // const sqEvents = await scrapeDaysmartLocation(sqUrl, "Skatequest", dateStr);
+    // results.push(...sqEvents);
+
+    console.log(`scraped events for ${dateStr}`);
   }
 
+  console.log('scrape complete, saving to ice_times.json');
   fs.writeFileSync('ice_times.json', JSON.stringify(results, null, 2));
   await browser.close();
 })();

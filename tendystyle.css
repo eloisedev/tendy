@@ -1,0 +1,55 @@
+.left {
+    display: flex;
+    width: 30vw;
+    height: 85vw;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: "Stack Sans Text", sans-serif;
+}
+
+.right {
+    display: flex;
+    width: 30vw;
+    height: 85vw;
+}
+.top {
+    display: flex;
+    width: 50vw;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.bottom {
+    display: flex;
+    height:100%;
+    flex-direction: row;
+}
+#dates {
+    cursor: pointer;
+}
+select{
+    cursor: pointer;
+}
+@media screen and (max-width: 600px) {
+    .left, .right {
+        width: 50vw;
+    }
+    .top {
+        display: flex;
+        width: 100vw;
+        height: 15vw;
+        padding-left: 40vw;
+    }
+    .left {
+        margin-left: 23px;;
+    }
+    select{
+        width: 20%;
+    }
+    
+}
