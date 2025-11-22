@@ -38,6 +38,15 @@ body {
 
 select{
     cursor: pointer;
+    margin: 10px;
+    background-color: rgba(239, 239, 239, 0.594);
+    border-radius: 20px;;
+    border: none;
+
+}
+a {
+    text-decoration: none;
+    color: rgba(53, 52, 52, 0.894);
 }
 footer {
     bottom: 0;
@@ -46,6 +55,12 @@ footer {
     text-align: center;
     z-index: 1000;
   }
+.event-card {
+    margin: 10px;
+    background-color: rgba(239, 239, 239, 0.594);
+    padding: 15px;
+    border-radius: 20px;;
+}
 @media screen and (max-width: 600px) {
     .left, .right {
         width: 50vw;
