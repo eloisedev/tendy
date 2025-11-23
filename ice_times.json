@@ -1,18 +1,18 @@
 [
   {
-    "title": "Stick n Shoot-Morning",
-    "time": "5:50am - 7:00am",
+    "title": "Stick n Shoot 12U",
+    "time": "12:30pm - 1:50pm",
     "price": "$20.00",
-    "location": "MedStar Capitals Iceplex",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-22&sport_ids=31&",
+    "location": "Ashburn Ice House",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-23&sport_ids=30&",
     "date": "2025-11-22"
   },
   {
-    "title": "Stick n Shoot-Afternoon",
-    "time": "2:10pm - 3:20pm",
+    "title": "Stick n Shoot- Weekends",
+    "time": "3:50pm - 5:10pm",
     "price": "$20.00",
-    "location": "MedStar Capitals Iceplex",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-22&sport_ids=31&",
+    "location": "Ashburn Ice House",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-23&sport_ids=30&",
     "date": "2025-11-22"
   },
   {
@@ -76,7 +76,7 @@
     "time": "12:00pm - 1:30pm",
     "price": "$20.00",
     "location": "Ashburn Ice House",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-24&&sport_ids=30",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-24&sport_ids=30&",
     "date": "2025-11-24"
   },
   {
@@ -132,7 +132,7 @@
     "time": "1:50pm - 3:00pm",
     "price": "$20.00",
     "location": "Ashburn Ice House",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-26&sport_ids=30&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-26&&sport_ids=30",
     "date": "2025-11-26"
   },
   {
@@ -140,7 +140,7 @@
     "time": "6:20pm - 7:50pm",
     "price": "$20.00",
     "location": "Ashburn Ice House",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-26&sport_ids=30&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-26&&sport_ids=30",
     "date": "2025-11-26"
   },
   {
@@ -148,7 +148,7 @@
     "time": "8:00pm - 9:10pm",
     "price": "$20.00",
     "location": "Ashburn Ice House",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-26&sport_ids=30&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/ashburn/event-registration?date=2025-11-26&&sport_ids=30",
     "date": "2025-11-26"
   },
   {
@@ -164,7 +164,7 @@
     "time": "6:50am - 8:00am",
     "price": "$20.00",
     "location": "MedStar Capitals Iceplex",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-28&sport_ids=31&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-28&&sport_ids=31",
     "date": "2025-11-28"
   },
   {
@@ -172,7 +172,7 @@
     "time": "6:40pm - 7:50pm",
     "price": "$20.00",
     "location": "MedStar Capitals Iceplex",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-28&sport_ids=31&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-28&&sport_ids=31",
     "date": "2025-11-28"
   },
   {
@@ -236,7 +236,7 @@
     "time": "5:30am - 6:40am",
     "price": "$20.00",
     "location": "MedStar Capitals Iceplex",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-29&sport_ids=31&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-29&&sport_ids=31",
     "date": "2025-11-29"
   },
   {
@@ -244,7 +244,7 @@
     "time": "6:10pm - 7:20pm",
     "price": "$20.00",
     "location": "MedStar Capitals Iceplex",
-    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-29&sport_ids=31&",
+    "link": "https://apps.daysmartrecreation.com/dash/x/#/online/capitals/event-registration?date=2025-11-29&&sport_ids=31",
     "date": "2025-11-29"
   },
   {
